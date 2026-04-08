@@ -23,7 +23,10 @@ export default function LoginPage() {
         method: "POST",
         body,
       });
-      if (!res.ok) throw new Error("Login failed");
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.detail || "Login failed");
+      }
       const data = await res.json();
       localStorage.setItem("sa_token", data.access_token);
 
