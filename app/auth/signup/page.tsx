@@ -34,10 +34,11 @@ export default function SignupPage() {
     }
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: normalizedEmail, password }),
       });
       
       if (!res.ok) {
@@ -48,7 +49,7 @@ export default function SignupPage() {
       const userData = await res.json();
       
       // Auto-login
-      const body = new URLSearchParams({ username: email, password });
+      const body = new URLSearchParams({ username: normalizedEmail, password });
       const loginRes = await fetch(`${API_BASE}/auth/token`, { method: "POST", body });
       
       if (loginRes.ok) {

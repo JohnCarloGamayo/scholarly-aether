@@ -18,7 +18,8 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const body = new URLSearchParams({ username: email, password });
+      const normalizedEmail = email.trim().toLowerCase();
+      const body = new URLSearchParams({ username: normalizedEmail, password });
       const res = await fetch(`${API_BASE}/auth/token`, {
         method: "POST",
         body,

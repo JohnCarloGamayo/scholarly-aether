@@ -22,10 +22,11 @@ export default function ForgotPasswordPage() {
     setMessage(null);
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const res = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: normalizedEmail }),
       });
 
       if (!res.ok) {
@@ -49,10 +50,11 @@ export default function ForgotPasswordPage() {
     setMessage(null);
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const res = await fetch(`${API_BASE}/auth/verify-reset-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email: normalizedEmail, code }),
       });
 
       if (!res.ok) {
@@ -87,10 +89,11 @@ export default function ForgotPasswordPage() {
     }
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const res = await fetch(`${API_BASE}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code, new_password: newPassword }),
+        body: JSON.stringify({ email: normalizedEmail, code, new_password: newPassword }),
       });
 
       if (!res.ok) {
