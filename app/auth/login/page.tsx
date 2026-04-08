@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://scholarly-aether-backend.onrender.com";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,18 +26,26 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Login failed");
       const data = await res.json();
       localStorage.setItem("sa_token", data.access_token);
-      
-      // Fetch user info to store email and ID
-      const userRes = await fetch(`${API_BASE}/auth/me`, {
-        headers: { Authorization: `Bearer ${data.access_token}` },
-      });
-      if (userRes.ok) {
-        const userData = await userRes.json();
-        localStorage.setItem("sa_user_email", userData.email);
-        localStorage.setItem("sa_user_id", userData.id);
-      }
-      
+
+      // Navigate immediately after token success so UI never gets stuck on "Signing in..."
       router.push("/dashboard");
+
+      // Best-effort profile fetch with timeout; do not block login success path.
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        const userRes = await fetch(`${API_BASE}/auth/me`, {
+          headers: { Authorization: `Bearer ${data.access_token}` },
+          signal: controller.signal,
+        });
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          localStorage.setItem("sa_user_email", userData.email);
+          localStorage.setItem("sa_user_id", userData.id);
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
     } catch (err) {
       setError((err as Error).message);
     } finally {
